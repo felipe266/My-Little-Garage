@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Guia Didático: Iluminação e Sombra em Computação Gráfica</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;600&display=swap');
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f6fa;
+      color: #1e293b;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: white;
+      padding: 36px 40px;
+      position: relative;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      color: #fde047;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 1.05rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+    .content {
+      padding: 40px;
+    }
+    h2 {
+      font-size: 1.35rem;
+      color: #1e3a8a;
+      margin: 32px 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2:first-of-type { margin-top: 0; }
+    h3 {
+      font-size: 1.1rem;
+      color: #2563eb;
+      margin: 24px 0 10px 0;
+    }
+    p { margin-bottom: 14px; font-size: 0.98rem; color: #334155; }
+    
+    .callout {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+    .callout-title {
+      font-weight: 700;
+      color: #166534;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+    .callout-body {
+      color: #14532d;
+      font-size: 0.92rem;
+      margin-bottom: 0;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #3b82f6;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .card-name {
+      font-family: 'Fira Code', monospace;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1e40af;
+    }
+    .card-meta {
+      font-size: 0.82rem;
+      color: #64748b;
+    }
+    .card-val {
+      font-family: 'Fira Code', monospace;
+      background: #e2e8f0;
+      color: #0f172a;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .card-row {
+      margin-top: 6px;
+      font-size: 0.92rem;
+      display: flex;
+      gap: 8px;
+    }
+    .card-label {
+      font-weight: 600;
+      min-width: 120px;
+      color: #475569;
+    }
+    .card-exp {
+      color: #b45309;
+      font-weight: 600;
+    }
+    .card-text {
+      color: #1e293b;
+      flex: 1;
+    }
+
+    .step-box {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-left: 3px solid #64748b;
+    }
+    .step-title {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .step-body {
+      font-size: 0.92rem;
+      color: #475569;
+      margin-bottom: 0;
+    }
+
+    .math-formula {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: 'Fira Code', monospace;
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+      text-align: left;
+      line-height: 1.7;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; border: none; }
+      .card { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">Sprint 2 • Computação Gráfica • OpenGL & Python</div>
+    <h1>Iluminação & Sombra em Computação Gráfica</h1>
+    <p>Dicionário Didático de Variáveis, Funções Próprias e Roteiro de Apresentação</p>
+  </div>
+
+  <div class="content">
+    <h2>1. Visão Geral: O Desafio da Luz e da Sombra em 3D</h2>
+    <p>
+      Em Computação Gráfica, a tela do computador é estritamente bidimensional (2D). Quando renderizamos modelos 3D apenas com cores ou texturas puras, os objetos parecem colagens de papel planas. Não dá para distinguir onde começa ou termina uma aresta ou se uma face está inclinada.
+    </p>
+    <p>
+      A <strong>Iluminação</strong> e a <strong>Sombra</strong> são as duas principais pistas visuais que o cérebro humano utiliza para deduzir profundidade, volume e contato físico com o chão. Neste projeto, implementamos uma solução compacta e ideal para nível júnior: <em>Iluminação Difusa Direcional (Lambert) + Luz Ambiente</em> usando <strong>funções próprias de produto vetorial e produto escalar</strong>, somadas a <em>Sombras Planar Projetadas</em> baseadas na própria malha 3D.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">💡 Regra de Ouro da Computação Gráfica Júnior</div>
+      <div class="callout-body">
+        O <strong>CPU (Python)</strong> cuida da lógica, das posições e envia ordens. A <strong>GPU (Placa de Vídeo e Shaders GLSL)</strong> executa as nossas funções de iluminação em paralelo para cada pixel desenhado na tela!
+      </div>
+    </div>
+
+    <h2>2. Dicionário Completo de Variáveis e Funções Manuais</h2>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">calcularNormal(vec3 A, vec3 B)</span>
+        <span class="card-meta">fragmentShad.glsl</span>
+        <span class="card-val">A &times; B (Produto Vetorial)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Nossa implementação manual do Produto Vetorial (substitui o cross do GLSL).</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Recebe duas tangentes da face e multiplica cruzadamente: vec3(A.y*B.z - A.z*B.y, A.z*B.x - A.x*B.z, A.x*B.y - A.y*B.x). Retorna um vetor perfeitamente perpendicular à superfície sem usar funções prontas da placa de vídeo!</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">calcularIluminacao(vec3 A, vec3 B)</span>
+        <span class="card-meta">fragmentShad.glsl</span>
+        <span class="card-val">A &bull; B (Produto Escalar)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Nossa implementação manual do Produto Escalar (substitui o dot do GLSL).</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Multiplica coordenada com coordenada e soma: A.x*B.x + A.y*B.y + A.z*B.z. Retorna um número único que mede o alinhamento de dois vetores. Se apontam para o mesmo lado, dá positivo; se apontam para lados opostos, dá negativo!</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">normalizarVetor(vec3 A)</span>
+        <span class="card-meta">fragmentShad.glsl</span>
+        <span class="card-val">A / comprimento (Normalização)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Nossa implementação manual da Normalização (substitui o normalize do GLSL).</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Calcula o tamanho do vetor por Pitágoras em 3D: sqrt(x*x + y*y + z*z), e divide cada eixo por ele. Assim, a flecha passa a ter tamanho exatamente 1.0! Tem proteção if (comprimento &lt; 0.000001) para nunca dar divisão por zero.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">usarLuz</span>
+        <span class="card-meta">mode3D.py / fragmentShad.glsl</span>
+        <span class="card-val">1 (3D) ou 0 (2D)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Interruptor que avisa à GPU se o modelo atual deve receber iluminação ou cor pura.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">É o interruptor de um quarto: no mundo 3D ligamos a luz (1) para dar volume aos móveis; no menu 2D desligamos (0) para que os botões fiquem sempre 100% nítidos.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">lightDir</span>
+        <span class="card-meta">mode3D.py</span>
+        <span class="card-val">vec3(0.5, 1.0, 0.4)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Vetor tridimensional que define a direção de onde vem a luz solar direta.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Posicionamos o Sol no céu virtual: Y=1.0 (alto), X=0.5 (um pouco à direita) e Z=0.4 (um pouco à frente). Essa inclinação gera um contraste tridimensional perfeito em qualquer cubo.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">lightColor</span>
+        <span class="card-meta">mode3D.py</span>
+        <span class="card-val">vec3(0.85, 0.85, 0.80)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Cor e intensidade da luz direta do Sol que atinge as superfícies.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Valores vão de 0.0 (preto) a 1.0 (branco). Escolhemos 0.85 com azul um pouco menor (0.80), gerando uma luz quente e suave de manhã solar.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">ambientColor</span>
+        <span class="card-meta">mode3D.py</span>
+        <span class="card-val">vec3(0.45, 0.45, 0.50)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Luz ambiente indireta, simulando a claridade que rebate nas paredes e no teto.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Sem luz ambiente, as partes que não olham para o Sol ficariam pretas como breu. A luz ambiente garante que o lado de trás continue visível com 45% de claridade suave.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">N (Normal da Superfície)</span>
+        <span class="card-meta">fragmentShad.glsl</span>
+        <span class="card-val">normalize(calcularNormal(...))</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Vetor perpendicular à superfície, indicando para onde a face está "olhando".</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Imagine um prego perpendicular espetado na madeira: se o prego aponta para cima, é o teto; se aponta para a direita, é uma parede lateral. É a bússola de cada face!</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">diff (Fator Difuso / Brilho)</span>
+        <span class="card-meta">fragmentShad.glsl</span>
+        <span class="card-val">max(calcularIluminacao(N, L), 0.0)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Número entre 0.0 e 1.0 que quantifica quanta luz solar a superfície recebe pelo seu ângulo.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Lei do Cosseno de Lambert calculada com nossa função calcularIluminacao: face de frente para o Sol = 1.0 (brilho máximo); inclinada = brilha menos; de costas = 0.0 (lado de sombra).</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">isSombra</span>
+        <span class="card-meta">mode3D.py / fragmentShad.glsl</span>
+        <span class="card-val">1 (sombra) ou 0</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Modo que pinta a malha como silhueta escura translúcida (vec4(0.06, 0.06, 0.10, 0.45)).</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Ignora as texturas de madeira e cospe uma estampa azul-escura com 45% de opacidade no chão, deixando os veios do piso visíveis por baixo.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">ALTURA_ELEVACAO</span>
+        <span class="card-meta">main.py</span>
+        <span class="card-val">0.25</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Distância vertical que o objeto "levita" no ar enquanto o usuário o arrasta com o mouse.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Ao pegar uma caixa no mundo real, nós a erguemos. Subir 0.25 unidades descola o objeto da sombra, dando sensação tátil imediata de que você está segurando o item.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">alturaApoio</span>
+        <span class="card-meta">main.py / mode3D.py</span>
+        <span class="card-val">0.0 (chão) ou 1.15 (mesa)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Altura da superfície de apoio logo abaixo da peça onde a sombra deve ser carimbada.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">Se a caixa estiver no chão, a sombra fica no piso (0.0). Se estiver em cima da bancada, a sombra sobe para o tampo da mesa (1.15). A sombra nunca afunda no vazio.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-name">S.y = 0.0001 (Matriz de Escala)</span>
+        <span class="card-meta">mode3D.py (renderSombra)</span>
+        <span class="card-val">glm.scale(1.0, 0.0001, 1.0)</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label">Significado:</span>
+        <span class="card-text">Fator que achata a altura do modelo 3D contra o piso.</span>
+      </div>
+      <div class="card-row">
+        <span class="card-label card-exp">Como Explicar:</span>
+        <span class="card-text">A analogia do "rolo compressor": esmagamos a altura do objeto 3D até virar uma folha quase plana. Assim, a sombra tem exatamente o formato do objeto original!</span>
+      </div>
+    </div>
+
+    <h2>3. A Matemática das Nossas Funções</h2>
+
+    <h3>A. O Código das Funções no Shader</h3>
+    <div class="math-formula">
+// Produto Escalar manual (substitui dot):<br>
+float calcularIluminacao(vec3 A, vec3 B) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return A.x * B.x + A.y * B.y + A.z * B.z;<br>
+}<br><br>
+// Produto Vetorial manual (substitui cross):<br>
+vec3 calcularNormal(vec3 A, vec3 B) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return vec3(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A.y * B.z - A.z * B.y,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A.z * B.x - A.x * B.z,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A.x * B.y - A.y * B.x<br>
+&nbsp;&nbsp;&nbsp;&nbsp;);<br>
+}<br><br>
+// Normalização manual (substitui normalize):<br>
+vec3 normalizarVetor(vec3 A) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float comprimento = sqrt(A.x * A.x + A.y * A.y + A.z * A.z);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (comprimento &lt; 0.000001) return vec3(0.0);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return A / comprimento;<br>
+}
+    </div>
+
+    <h3>B. A Analogia da Lanterna (calcularIluminacao e Lei de Lambert)</h3>
+    <p>
+      A função <code>calcularIluminacao(N, L)</code> mede o alinhamento entre o "prego" da face e os raios de Sol:
+    </p>
+    <ul>
+      <li><strong>Lanterna de frente (0°):</strong> Foco concentrado e brilhante &rarr; <code>resultado = 1.0</code>.</li>
+      <li><strong>Lanterna inclinada (45° a 60°):</strong> Foco espalha &rarr; <code>resultado</code> cai para <code>0.7 ~ 0.3</code>.</li>
+      <li><strong>Lanterna por trás (90° a 180°):</strong> A face está no escuro. O <code>max(..., 0.0)</code> impede que fique negativo e crava em <code>0.0</code>.</li>
+    </ul>
+
+    <div class="math-formula">
+      corFinal = (ambientColor + lightColor * diff) * texColor
+    </div>
+
+    <h2>4. Roteiro Prático para Apresentar (2 Minutos)</h2>
+    <div class="step-box">
+      <div class="step-title">1. Introdução Visual</div>
+      <div class="step-body">"Reparem como o cenário ganha volume 3D quando as faces reagem à inclinação em relação ao Sol virtual."</div>
+    </div>
+    <div class="step-box">
+      <div class="step-title">2. Duas Luzes Complementares</div>
+      <div class="step-body">"Usamos luz ambiente suave (para o verso dos móveis não ficar escuro) e luz solar direcional calculada em tempo real na GPU pela Lei de Lambert."</div>
+    </div>
+    <div class="step-box">
+      <div class="step-title">3. Funções Próprias de Álgebra Linear</div>
+      <div class="step-body">"Em vez de chamar funções prontas da biblioteca (cross, dot e normalize), nós mesmos escrevemos calcularNormal, calcularIluminacao e normalizarVetor diretamente em GLSL para aplicar as fórmulas matemáticas puras."</div>
+    </div>
+    <div class="step-box">
+      <div class="step-title">4. Demonstração ao Vivo</div>
+      <div class="step-body">"Ao clicar e arrastar um objeto, ele levita (ALTURA_ELEVACAO = 0.25) e revela a sombra projetada no chão com o formato exato da peça."</div>
+    </div>
+    <div class="step-box">
+      <div class="step-title">5. Fechamento Técnico</div>
+      <div class="step-body">"A sombra usa projeção planar por matriz de escala, e a iluminação calcula normais por derivadas de tela com nossa função manual, mantendo o código limpo, didático e de alto nível."</div>
+    </div>
+
+    <div class="callout" style="border-left-color: #3b82f6; background: #eff6ff;">
+      <div class="callout-title" style="color: #1e40af;">🎯 Resumo em Uma Frase</div>
+      <div class="callout-body" style="color: #1e3a8a;">
+        A iluminação diz para o olho onde a peça está virada; a sombra diz para o olho onde a peça está pisando!
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

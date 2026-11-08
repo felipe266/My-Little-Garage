@@ -39,8 +39,9 @@ float calcularLuzSpot(vec3 N) {
     vec3 dirPixel = -L;
     float anguloCone = calcularIluminacao(dirPixel, camDir);
     float intensidadeLanterna = 0.0;
-    if (anguloCone > 0.91) {
-        intensidadeLanterna = (anguloCone - 0.91) / (1.0 - 0.91);
+    float num = 0.95;
+    if (anguloCone > num) {
+        intensidadeLanterna = (anguloCone - num) / (1.0 - num);
         intensidadeLanterna = intensidadeLanterna * intensidadeLanterna;
     }
     float dist = length(camPos - worldPos);

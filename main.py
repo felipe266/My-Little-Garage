@@ -57,7 +57,7 @@ ALTURA_ELEVACAO = 0.25
 
 def init():
     global camera, myShader, obj, myTexture, projMatrix, menu
-    glClearColor(0.8, 0.8, 0.8, 1)
+    glClearColor(0.3, 0.3, 0.3, 1)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_MULTISAMPLE)
     glEnable(GL_BLEND)
@@ -89,10 +89,9 @@ def init():
 
     # moveis que ja comecam na cena
     moveis.extend([
-        Modelo3D(os.path.join(here, 'objetos/bancada.obj'), os.path.join(here, 'textura/parede.png'), (-2, -1.5, -5.5)),
-        Modelo3D(os.path.join(here, 'objetos/estante.obj'), os.path.join(here, 'textura/parede2.png'), (2, -1.5, -7)),
-        Modelo3D(os.path.join(here, 'objetos/caixa.obj'), os.path.join(here, 'textura/parede.png'), (0, -1.5, -4)),
-        Modelo3D(os.path.join(here, 'objetos/caixa.obj'), os.path.join(here, 'textura/parede2.png'), (1, -1.5, -5))
+        Modelo3D(os.path.join(here, 'objetos/bancada.obj'), os.path.join(here, 'textura/bancada.png'), (-2, -1.5, -5.5)),
+        Modelo3D(os.path.join(here, 'objetos/estante.obj'), os.path.join(here, 'textura/extante.png'), (2, -1.5, -7)),
+        Modelo3D(os.path.join(here, 'objetos/caixa.obj'), os.path.join(here, 'textura/caixa.png'), (0, -1.5, -4))
     ])
 
     camera = Camera(anguloHorizontal, anguloVertical)
@@ -107,12 +106,12 @@ def init():
         {
             'nome': 'Estante',
             'obj': os.path.join(here, 'objetos/estante.obj'),
-            'tex': os.path.join(here, 'textura/parede2.png')
+            'tex': os.path.join(here, 'textura/extante.png')
         },
         {
             'nome': 'Caixa Madeira',
             'obj': os.path.join(here, 'objetos/caixa.obj'),
-            'tex': os.path.join(here, 'textura/parede.png')
+            'tex': os.path.join(here, 'textura/caixa.png')
         },
         {
             'nome': 'pneu',

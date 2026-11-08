@@ -11,6 +11,8 @@ from mode3D import Modelo3D
 from picking import raioMouse, selecionar, pontoPlano
 from menu import MenuLateral
 
+
+#variaveis globais
 obj = {}
 myTexture = None
 myShader = None
@@ -30,6 +32,8 @@ anguloVertical = math.radians(35.264)
 angGiroObj = 5.0
 tamEscala = 0.01
 luzLigada = True
+modoSpot = False
+
 # controle do menu e arrasto
 menu = None
 itemArrastando = None        # item selecionado no menu
@@ -74,6 +78,8 @@ def init():
     shaderes['ambientColor'] = glGetUniformLocation(myShader.shaderId, 'ambientColor')
     shaderes['camPos'] = glGetUniformLocation(myShader.shaderId, 'camPos')
     shaderes['camDir'] = glGetUniformLocation(myShader.shaderId, 'camDir')
+    shaderes['modoSpot'] = glGetUniformLocation(myShader.shaderId, 'modoSpot')
+
 
 
     # chao e paredes
@@ -151,7 +157,22 @@ def render():
     # parametros da luz
     glUniform1i(shaderes['usarLuz'], 1)
     glUniform1i(shaderes['isSombra'], 0)
-    glUniform3f(shaderes['ambientColor'], 0.30, 0.30, 0.35)
+    glUniform3f(shaderes['lightDir'], 0.5, 1.0, 0.4)
+    glUniform3f(shaderes['camPos'], camera.posicao.x, camera.posicao.y, camera.posicao.z)
+
+    # direcao da camera para o spot da lanterna
+    frenteCam = glm.normalize(camera.alvo - camera.posicao)
+    glUniform3f(shaderes['camDir'], frenteCam.x, frenteCam.y, frenteCam.z)
+
+    if modoSpot:
+        glUniform1i(shaderes['modoSpot'], 1)
+        glUniform3f(shaderes['lightColor'], 1.3, 1.3, 1.15)
+        glUniform3f(shaderes['ambientColor'], 0.25, 0.25, 0.30)
+    else:
+        glUniform1i(shaderes['modoSpot'], 0)
+        glUniform3f(shaderes['lightColor'], 0.85, 0.85, 0.80)
+        glUniform3f(shaderes['ambientColor'], 0.45, 0.45, 0.50)
+
     glUniform3f(shaderes['camPos'], camera.posicao.x, camera.posicao.y, camera.posicao.z)
 
     # envia a direcao da mira da camera para a lanterna
@@ -317,12 +338,12 @@ def scrollMouse(window, xoffset, yoffset):
 
 
 def teclado(window, key, scancode, action, mods):
-    global selecionado, luzLigada
+    global selecionado, modoSpot
     if action == glfw.PRESS:
         if key == glfw.KEY_ESCAPE:
             glfw.set_window_should_close(window, True)
-        elif key == glfw.KEY_L:
-            luzLigada = not luzLigada   # inverte: se tava True vira False, e vice-versa
+        elif key == glfw.KEY_SPACE:          # ou glfw.KEY_L
+            modoSpot = not modoSpot          # inverte: True <-> False
         elif key in (glfw.KEY_DELETE, glfw.KEY_BACKSPACE):
             if selecionado is not None and selecionado in moveis:
                 moveis.remove(selecionado)

@@ -8,6 +8,8 @@ out vec4 fragColor;
 uniform sampler2D imagem;
 uniform bool usarLuz;
 uniform bool isSombra;
+uniform bool modoSpot;
+uniform vec3 lightDir;
 uniform vec3 lightColor;
 uniform vec3 ambientColor;
 uniform vec3 camPos;
@@ -25,6 +27,25 @@ vec3 calcularNormal(vec3 A, vec3 B) {
         A.z * B.x - A.x * B.z,
         A.x * B.y - A.y * B.x
     );
+}
+
+float calcularLuzDireta(vec3 N) {
+    vec3 L = normalize(lightDir);
+    return max(calcularIluminacao(N, L), 0.0);
+}
+
+float calcularLuzSpot(vec3 N) {
+    vec3 L = normalize(camPos - worldPos);
+    vec3 dirPixel = -L;
+    float anguloCone = calcularIluminacao(dirPixel, camDir);
+    float intensidadeLanterna = 0.0;
+    if (anguloCone > 0.91) {
+        intensidadeLanterna = (anguloCone - 0.91) / (1.0 - 0.91);
+        intensidadeLanterna = intensidadeLanterna * intensidadeLanterna;
+    }
+    float dist = length(camPos - worldPos);
+    float atenuacao = 1.0 / (1.0 + 0.015 * dist);
+    return max(calcularIluminacao(N, L), 0.0) * intensidadeLanterna * atenuacao;
 }
 
 void main(){
@@ -50,20 +71,12 @@ void main(){
         N = -N;
     }
 
-    vec3 L = normalize(camPos - worldPos);
-    vec3 dirPixel = -L;
-
-    float anguloCone = calcularIluminacao(dirPixel, camDir);
-    float intensidadeLanterna = 0.0;
-    if (anguloCone > 0.91) {
-        intensidadeLanterna = (anguloCone - 0.91) / (1.0 - 0.91);
-        intensidadeLanterna = intensidadeLanterna * intensidadeLanterna;
+    float diff = 0.0;
+    if (modoSpot) {
+        diff = calcularLuzSpot(N);
+    } else {
+        diff = calcularLuzDireta(N);
     }
-
-    float dist = length(camPos - worldPos);
-    float atenuacao = 1.0 / (1.0 + 0.015 * dist);
-
-    float diff = max(calcularIluminacao(N, L), 0.0) * intensidadeLanterna * atenuacao;
 
     vec3 iluminacao = ambientColor + lightColor * diff;
 

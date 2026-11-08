@@ -10,7 +10,7 @@ from camera import Camera
 from mode3D import Modelo3D
 from picking import raioMouse, selecionar, pontoPlano
 from menu import MenuLateral
-
+#mundao isso aquqi pra fazer ttestes
 obj = {}
 myTexture = None
 myShader = None

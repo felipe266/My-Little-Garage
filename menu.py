@@ -7,10 +7,25 @@ from PIL import Image, ImageDraw
 from textura import Textura
 
 
+# funcao manual para testar se um ponto 2D esta dentro de um retangulo
+def pontoNoRetangulo(px, py, rx, ry, rw, rh):
+    if px < rx or px > rx + rw:
+        return False
+    if py < ry or py > ry + rh:
+        return False
+    return True
+
+
+# funcao manual para achar o menor entre dois numeros (substitui min)
+def menorNumero(a, b):
+    if a < b:
+        return a
+    return b
+
+
 class Quad2D:
-    """Renderizador de retângulos 2D usando projeção ortográfica."""
+    # renderizador de retangulo 2D em projecao ortografica
     def __init__(self):
-        # Vértices 2D de (0,0) a (1,1): pos (x, y, z), uv (u, v)
         vertices = np.array([
             0.0, 0.0, 0.0,   0.0, 1.0,
             1.0, 0.0, 0.0,   1.0, 1.0,
@@ -28,11 +43,11 @@ class Quad2D:
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
 
-        # local 0: posição (vec3)
+        # posicao (vec3)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
         glEnableVertexAttribArray(0)
 
-        # local 1: coordenadas de textura uv (vec2)
+        # coordenadas uv (vec2)
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
         glEnableVertexAttribArray(1)
 
@@ -53,30 +68,37 @@ class Quad2D:
 
 
 class MenuLateral:
-    """Menu lateral flutuante com catálogo de itens arrastáveis."""
+    # barra lateral com catalogo de itens
     def __init__(self, itens, largura=190, cardLargura=170, cardAltura=85):
         self.itens = itens
         self.quad = Quad2D()
 
-        # ==============================================================
-        # CONFIGURAÇÕES DE TAMANHO DO MENU (Altere estes valores para mudar o tamanho)
-        # ==============================================================
-        self.largura = largura            # Largura total da barra lateral (ex: 190 a 230)
-        self.cardLargura = cardLargura    # Largura de cada cartão/botão de item (ex: 170 a 200)
-        self.cardAltura = cardAltura      # Altura de cada cartão/botão de item (ex: 85 a 100)
-        self.espacamento = 10             # Espaçamento vertical entre os cartões
-        self.margemTopo = 48              # Altura do cabeçalho com o título "ITENS"
-        self.margemDireita = 20           # Distância da borda direita da janela
-        self.margemSuperior = 25          # Distância da borda superior da janela
+        self.largura = largura
+        self.cardLargura = cardLargura
+        self.cardAltura = cardAltura
+        self.espacamento = 10
+        self.margemTopo = 48
+        self.margemDireita = 20
+        self.margemSuperior = 25
         self.itemHover = None
 
-        # Altura total calculada automaticamente com base no número de itens
-        self.altura = self.margemTopo + len(self.itens) * (self.cardAltura + self.espacamento) + 12
+        # calcula altura total com base na quantidade de itens
+        totalItens = len(self.itens)
+        self.altura = self.margemTopo + totalItens * (self.cardAltura + self.espacamento) + 12
 
-        # Gera as texturas do fundo e dos cartões
+        # gera as texturas do fundo
         self.texFundo = self.gerarFundo(self.largura, self.altura)
-        self.texCards = [self.gerarCard(item, destacado=False) for item in self.itens]
-        self.texCardsHover = [self.gerarCard(item, destacado=True) for item in self.itens]
+
+        # cria as texturas dos cards com loop manual (sem list comprehension)
+        self.texCards = []
+        for item in self.itens:
+            tex = self.gerarCard(item, destacado=False)
+            self.texCards.append(tex)
+
+        self.texCardsHover = []
+        for item in self.itens:
+            texHover = self.gerarCard(item, destacado=True)
+            self.texCardsHover.append(texHover)
 
     def obterPosicao(self, resolucao):
         x = resolucao[0] - self.largura - self.margemDireita
@@ -85,7 +107,7 @@ class MenuLateral:
 
     def contemPonto(self, px, py, resolucao):
         x, y = self.obterPosicao(resolucao)
-        return x <= px <= x + self.largura and y <= py <= y + self.altura
+        return pontoNoRetangulo(px, py, x, y, self.largura, self.altura)
 
     def obterItemNoPonto(self, px, py, resolucao):
         x, y = self.obterPosicao(resolucao)
@@ -96,7 +118,7 @@ class MenuLateral:
         cyAtual = y + self.margemTopo
 
         for item in self.itens:
-            if cx <= px <= cx + self.cardLargura and cyAtual <= py <= cyAtual + self.cardAltura:
+            if pontoNoRetangulo(px, py, cx, cyAtual, self.cardLargura, self.cardAltura):
                 return item
             cyAtual += self.cardAltura + self.espacamento
 
@@ -108,83 +130,95 @@ class MenuLateral:
     def render(self, shaderId, resolucao):
         x, y = self.obterPosicao(resolucao)
 
-        # 1. Desenha o fundo da barra lateral
+        # fundo da barra lateral
         self.quad.desenhar(shaderId, self.texFundo.textureId, x, y, self.largura, self.altura)
 
-        # 2. Desenha cada item como um cartão
+        # desenha cada cartao
         cx = x + (self.largura - self.cardLargura) // 2
         cyAtual = y + self.margemTopo
 
-        for i, item in enumerate(self.itens):
+        i = 0
+        for item in self.itens:
             destacado = (self.itemHover is item)
-            tex = self.texCardsHover[i] if destacado else self.texCards[i]
+            if destacado:
+                tex = self.texCardsHover[i]
+            else:
+                tex = self.texCards[i]
+
             self.quad.desenhar(shaderId, tex.textureId, cx, cyAtual, self.cardLargura, self.cardAltura)
             cyAtual += self.cardAltura + self.espacamento
+            i += 1
 
     def desenharItemArrastando(self, shaderId, item, mx, my):
-        try:
-            idx = self.itens.index(item)
+        # acha o indice do item manualmente (sem usar .index())
+        idx = -1
+        for i in range(len(self.itens)):
+            if self.itens[i] is item:
+                idx = i
+                break
+
+        if idx != -1:
             tex = self.texCards[idx]
-            w, h = self.cardLargura, self.cardAltura
-            self.quad.desenhar(shaderId, tex.textureId, mx - w // 2, my - h // 2, w, h)
-        except Exception:
-            pass
+            w = self.cardLargura
+            h = self.cardAltura
+            posX = mx - w // 2
+            posY = my - h // 2
+            self.quad.desenhar(shaderId, tex.textureId, posX, posY, w, h)
 
     def gerarFundo(self, w, h):
         img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
-        # Painel de fundo escuro translúcido com borda suave
-        if hasattr(draw, 'rounded_rectangle'):
-            draw.rounded_rectangle([0, 0, w - 1, h - 1], radius=14, fill=(26, 28, 36, 235), outline=(75, 82, 105, 255), width=2)
-            draw.rounded_rectangle([4, 4, w - 5, 36], radius=10, fill=(38, 42, 55, 245))
-        else:
-            draw.rectangle([0, 0, w - 1, h - 1], fill=(26, 28, 36, 235), outline=(75, 82, 105, 255), width=2)
-            draw.rectangle([4, 4, w - 5, 36], fill=(38, 42, 55, 245))
+        # fundo escuro translúcido com borda
+        draw.rounded_rectangle([0, 0, w - 1, h - 1], radius=14, fill=(26, 28, 36, 235), outline=(75, 82, 105, 255), width=2)
+        draw.rounded_rectangle([4, 4, w - 5, 36], radius=10, fill=(38, 42, 55, 245))
 
-        # Título superior "ITENS"
-        try:
-            draw.text((w // 2, 20), "ITENS", fill=(240, 242, 255, 255), anchor="mm")
-        except Exception:
-            draw.text((w // 2 - 18, 12), "ITENS", fill=(240, 242, 255, 255))
+        # titulo superior
+        draw.text((w // 2, 20), "ITENS", fill=(240, 242, 255, 255), anchor="mm")
 
         return Textura(img)
 
     def gerarCard(self, item, destacado=False):
-        w, h = self.cardLargura, self.cardAltura
+        w = self.cardLargura
+        h = self.cardAltura
         img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
-        corFundo = (58, 64, 82, 250) if destacado else (38, 41, 52, 240)
-        corBorda = (0, 200, 255, 255) if destacado else (70, 78, 98, 220)
-
-        if hasattr(draw, 'rounded_rectangle'):
-            draw.rounded_rectangle([0, 0, w - 1, h - 1], radius=10, fill=corFundo, outline=corBorda, width=2 if destacado else 1)
+        if destacado:
+            corFundo = (58, 64, 82, 250)
+            corBorda = (0, 200, 255, 255)
+            larguraBorda = 2
+            corTexto = (255, 255, 255, 255)
         else:
-            draw.rectangle([0, 0, w - 1, h - 1], fill=corFundo, outline=corBorda, width=2 if destacado else 1)
+            corFundo = (38, 41, 52, 240)
+            corBorda = (70, 78, 98, 220)
+            larguraBorda = 1
+            corTexto = (225, 228, 238, 255)
 
-        # Tamanho da miniatura proporcional à altura do cartão
+        draw.rounded_rectangle([0, 0, w - 1, h - 1], radius=10, fill=corFundo, outline=corBorda, width=larguraBorda)
+
+        # miniatura do objeto
         tamanhoIcone = 44
-        texPath = item.get('tex', '')
-        if os.path.exists(texPath):
-            try:
-                texImg = Image.open(texPath).convert("RGBA")
-                tw, th = texImg.size
-                lado = min(tw, th)
-                cx, cy = tw // 2, th // 2
-                texImg = texImg.crop((cx - lado // 2, cy - lado // 2, cx + lado // 2, cy + lado // 2))
-                texImg = texImg.resize((tamanhoIcone, tamanhoIcone))
-                img.paste(texImg, ((w - tamanhoIcone) // 2, 8), texImg)
-            except Exception:
-                pass
+        texPath = ''
+        if 'tex' in item:
+            texPath = item['tex']
 
-        # Nome do item
-        nome = item.get('nome', '')
-        corTexto = (255, 255, 255, 255) if destacado else (225, 228, 238, 255)
+        if os.path.exists(texPath):
+            texImg = Image.open(texPath).convert("RGBA")
+            tw, th = texImg.size
+            lado = menorNumero(tw, th)
+            cx = tw // 2
+            cy = th // 2
+            texImg = texImg.crop((cx - lado // 2, cy - lado // 2, cx + lado // 2, cy + lado // 2))
+            texImg = texImg.resize((tamanhoIcone, tamanhoIcone))
+            img.paste(texImg, ((w - tamanhoIcone) // 2, 8), texImg)
+
+        # nome do item
+        nome = ''
+        if 'nome' in item:
+            nome = item['nome']
+
         posicaoYTexto = h - 16
-        try:
-            draw.text((w // 2, posicaoYTexto), nome, fill=corTexto, anchor="mm")
-        except Exception:
-            draw.text((12, posicaoYTexto - 6), nome, fill=corTexto)
+        draw.text((w // 2, posicaoYTexto), nome, fill=corTexto, anchor="mm")
 
         return Textura(img)

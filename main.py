@@ -10,7 +10,7 @@ from camera import Camera
 from mode3D import Modelo3D
 from picking import raioMouse, selecionar, pontoPlano
 from menu import MenuLateral
-#mundao isso aquqi pra fazer ttestes
+
 obj = {}
 myTexture = None
 myShader = None
@@ -29,7 +29,7 @@ anguloHorizontal = math.radians(45.0)
 anguloVertical = math.radians(35.264)
 angGiroObj = 5.0
 tamEscala = 0.01
-
+luzLigada = True
 # controle do menu e arrasto
 menu = None
 itemArrastando = None        # item selecionado no menu
@@ -46,13 +46,14 @@ ultimoMousePos = glm.vec2(0, 0)
 arrastandoPanCamera = False
 ultimoMousePan = glm.vec2(0, 0)
 
+
 # altura que o objeto levanta enquanto arrasta
 ALTURA_ELEVACAO = 0.25
 
 
 def init():
     global camera, myShader, obj, myTexture, projMatrix, menu
-    glClearColor(0.5, 0.5, 0.5, 1)
+    glClearColor(0.8, 0.8, 0.8, 1)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_MULTISAMPLE)
     glEnable(GL_BLEND)
@@ -72,6 +73,8 @@ def init():
     shaderes['lightColor'] = glGetUniformLocation(myShader.shaderId, 'lightColor')
     shaderes['ambientColor'] = glGetUniformLocation(myShader.shaderId, 'ambientColor')
     shaderes['camPos'] = glGetUniformLocation(myShader.shaderId, 'camPos')
+    shaderes['camDir'] = glGetUniformLocation(myShader.shaderId, 'camDir')
+
 
     # chao e paredes
     obj['chao'] = parede(os.path.join(here, "textura/piso.png"), (0, -1.5, -3.5), (10, 10, 1), (90, 0, 0), (10, 0.2, 10))
@@ -148,10 +151,18 @@ def render():
     # parametros da luz
     glUniform1i(shaderes['usarLuz'], 1)
     glUniform1i(shaderes['isSombra'], 0)
-    glUniform3f(shaderes['lightDir'], 0.5, 1.0, 0.4)
-    glUniform3f(shaderes['lightColor'], 0.85, 0.85, 0.80)
-    glUniform3f(shaderes['ambientColor'], 0.45, 0.45, 0.50)
+    glUniform3f(shaderes['ambientColor'], 0.30, 0.30, 0.35)
     glUniform3f(shaderes['camPos'], camera.posicao.x, camera.posicao.y, camera.posicao.z)
+
+    # envia a direcao da mira da camera para a lanterna
+    frenteCam = glm.normalize(camera.alvo - camera.posicao)
+    glUniform3f(shaderes['camDir'], frenteCam.x, frenteCam.y, frenteCam.z)
+
+    # interruptor da luz (tecla L)
+    if luzLigada:
+        glUniform3f(shaderes['lightColor'], 1.3, 1.3, 1.15)
+    else:
+        glUniform3f(shaderes['lightColor'], 0.0, 0.0, 0.0)
 
     # paredes e chao
     obj['chao'].render(myShader.shaderId)
@@ -283,7 +294,6 @@ def moverCamera(movimento):
     # não bateu em nada
     camera.posicao = novaPosicao
 
-
 def update(window):
     global anguloHorizontal, anguloVertical
     if glfw.get_key(window, glfw.KEY_D) == glfw.PRESS:
@@ -307,15 +317,16 @@ def scrollMouse(window, xoffset, yoffset):
 
 
 def teclado(window, key, scancode, action, mods):
-    global selecionado
+    global selecionado, luzLigada
     if action == glfw.PRESS:
         if key == glfw.KEY_ESCAPE:
             glfw.set_window_should_close(window, True)
+        elif key == glfw.KEY_L:
+            luzLigada = not luzLigada   # inverte: se tava True vira False, e vice-versa
         elif key in (glfw.KEY_DELETE, glfw.KEY_BACKSPACE):
             if selecionado is not None and selecionado in moveis:
                 moveis.remove(selecionado)
                 selecionado = None
-
 
 def raioJanela(window, x, y):
     largura, altura = glfw.get_window_size(window)

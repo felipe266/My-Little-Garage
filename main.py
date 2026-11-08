@@ -101,7 +101,7 @@ def init():
         {
             'nome': 'Bancada',
             'obj': os.path.join(here, 'objetos/bancada.obj'),
-            'tex': os.path.join(here, 'textura/parede.png')
+            'tex': os.path.join(here, 'textura/bancada.png')
         },
         {
             'nome': 'Estante',

@@ -106,12 +106,12 @@ class Modelo3D():
         )
 
         glVertexAttribPointer(
-            0, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0)
+            0, 3, GL_FLOAT, GL_FALSE, 5*4, ctypes.c_void_p(0)
         )
         glEnableVertexAttribArray(0)
 
         glVertexAttribPointer(
-            1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12)
+            1, 2, GL_FLOAT, GL_FALSE, 5*4, ctypes.c_void_p(3*4)
         )
         glEnableVertexAttribArray(1)
 

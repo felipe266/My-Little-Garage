@@ -74,16 +74,16 @@ def init():
     shaderes['camPos'] = glGetUniformLocation(myShader.shaderId, 'camPos')
 
     # chao e paredes
-    obj['chao'] = parede(os.path.join(here, "piso.png"), (0, -1.5, -3.5), (10, 10, 1), (90, 0, 0), (10, 0.2, 10))
-    obj['fundo'] = parede(os.path.join(here, "parede2.png"), (0, 1.0, -8.5), (10, 5, 1), (0, 0, 0), (10, 5, 0.2))
-    obj['lateral'] = parede(os.path.join(here, "parede.png"), (-5, 1.0, -3.5), (10, 5, 1), (0, 90, 0), (0.2, 5, 10))
+    obj['chao'] = parede(os.path.join(here, "textura/piso.png"), (0, -1.5, -3.5), (10, 10, 1), (90, 0, 0), (10, 0.2, 10))
+    obj['fundo'] = parede(os.path.join(here, "textura/parede2.png"), (0, 1.0, -8.5), (10, 5, 1), (0, 0, 0), (10, 5, 0.2))
+    obj['lateral'] = parede(os.path.join(here, "textura/parede.png"), (-5, 1.0, -3.5), (10, 5, 1), (0, 90, 0), (0.2, 5, 10))
 
     # moveis que ja comecam na cena
     moveis.extend([
-        Modelo3D(os.path.join(here, 'objetos/bancada.obj'), os.path.join(here, 'parede.png'), (-2, -1.5, -5.5)),
-        Modelo3D(os.path.join(here, 'objetos/estante.obj'), os.path.join(here, 'parede2.png'), (2, -1.5, -7)),
-        Modelo3D(os.path.join(here, 'objetos/caixa.obj'), os.path.join(here, 'parede.png'), (0, -1.5, -4)),
-        Modelo3D(os.path.join(here, 'objetos/caixa.obj'), os.path.join(here, 'parede2.png'), (1, -1.5, -5))
+        Modelo3D(os.path.join(here, 'objetos/bancada.obj'), os.path.join(here, 'textura/parede.png'), (-2, -1.5, -5.5)),
+        Modelo3D(os.path.join(here, 'objetos/estante.obj'), os.path.join(here, 'textura/parede2.png'), (2, -1.5, -7)),
+        Modelo3D(os.path.join(here, 'objetos/caixa.obj'), os.path.join(here, 'textura/parede.png'), (0, -1.5, -4)),
+        Modelo3D(os.path.join(here, 'objetos/caixa.obj'), os.path.join(here, 'textura/parede2.png'), (1, -1.5, -5))
     ])
 
     camera = Camera(anguloHorizontal, anguloVertical)
@@ -93,27 +93,42 @@ def init():
         {
             'nome': 'Bancada',
             'obj': os.path.join(here, 'objetos/bancada.obj'),
-            'tex': os.path.join(here, 'parede.png')
+            'tex': os.path.join(here, 'textura/parede.png')
         },
         {
             'nome': 'Estante',
             'obj': os.path.join(here, 'objetos/estante.obj'),
-            'tex': os.path.join(here, 'parede2.png')
+            'tex': os.path.join(here, 'textura/parede2.png')
         },
         {
             'nome': 'Caixa Madeira',
             'obj': os.path.join(here, 'objetos/caixa.obj'),
-            'tex': os.path.join(here, 'parede.png')
+            'tex': os.path.join(here, 'textura/parede.png')
         },
         {
-            'nome': 'Caixa Tijolo',
-            'obj': os.path.join(here, 'objetos/caixa.obj'),
-            'tex': os.path.join(here, 'parede2.png')
+            'nome': 'pneu',
+            'obj': os.path.join(here, 'objetos/pneu.obj'),
+            'tex': os.path.join(here, 'textura/pneu_textura.png')
         },
         {
-            'nome': 'Caixa Grama',
-            'obj': os.path.join(here, 'objetos/caixa.obj'),
-            'tex': os.path.join(here, 'grass.png')
+            'nome': 'alicate',
+            'obj': os.path.join(here, 'objetos/alicate.obj'),
+            'tex': os.path.join(here, 'textura/alicate.png')
+        },
+        {
+            'nome': 'chave_fenda',
+            'obj': os.path.join(here, 'objetos/chave_fenda.obj'),
+            'tex': os.path.join(here, 'textura/chave_fenda.png')
+        },
+        {
+            'nome': 'martelo',
+            'obj': os.path.join(here, 'objetos/martelo.obj'),
+            'tex': os.path.join(here, 'textura/martelo.png')
+        },
+        {
+            'nome': 'prego',
+            'obj': os.path.join(here, 'objetos/prego.obj'),
+            'tex': os.path.join(here, 'textura/prego.png')
         }
     ]
     menu = MenuLateral(itensCatalogo)
